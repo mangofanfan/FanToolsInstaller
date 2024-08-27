@@ -4,6 +4,8 @@ from os import getenv, getcwd, remove
 import requests
 import zipfile
 
+from manifest import getLatestVersion
+
 
 class Main:
     def __init__(self):
@@ -11,6 +13,11 @@ class Main:
 
         self._dataFile = getenv("LOCALAPPDATA")
         self._localFile = getcwd()
+
+        urlData = getLatestVersion()
+        self.versionUrl = urlData[1]
+        self.dataUrl = urlData[2]
+        self.latestVersion = urlData[3]
 
     def yesNo(self):
         a = input("请输入>>>（Y/N，大小写均可，其他输入均视作N）")
@@ -29,6 +36,7 @@ class Main:
         print("我们需要在您的计算机上做一些准备工作，然后您便可以与工具箱见面。")
         print("这是完整安装流程，您必须过目每一个步骤方可完成安装。另外，您可能需要暂时关闭正在运行的网络代理工具，以确保下载顺利。")
         print("本安装工具也是开源哒，没有病毒哒！")
+        print(Fore.BLUE + "将要安装最新版本：" + self.latestVersion)
         print(Fore.RED + "在接下来的每一个步骤中，您都需要输入Y或N来确认或取消，Y将进入下一步，N将返回上一步。")
         print(self.dividing)
         print(Fore.CYAN + "查看我们（安装工具）将要进行的操作")
@@ -124,7 +132,7 @@ class Main:
         return None
 
     def _downloadData(self):
-        res = requests.get("https://file.mangofanfan.cn/s/2rnz7i", stream=True)
+        res = requests.get(url=self.dataUrl, stream=True)
         with open(self._localFile + "/FanTools.zip", "wb") as f:
             for bl in res.iter_content(chunk_size=1024):
                 if bl:
@@ -137,7 +145,7 @@ class Main:
         return None
 
     def _downloadExe(self):
-        res = requests.get("https://file.mangofanfan.cn/s/kmpnbp", stream=True)
+        res = requests.get(url=self.versionUrl, stream=True)
         with open(self._localFile + "/芒果工具箱.exe", "wb") as f:
             for bl in res.iter_content(chunk_size=1024):
                 if bl:
